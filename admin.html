@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskNest – Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* --- STYLES --- */
+:root {
+  --primary: #0F172A;
+  --secondary: #2F6F73;
+  --bg: #F1F5F9;
+  --white: #ffffff;
+  --border: #E2E8F0;
+}
+
+body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg); color: #334155; }
+
+/* HEADER */
+header {
+  background: var(--primary); color: white; padding: 16px 24px;
+  display: flex; justify-content: space-between; align-items: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+header h2 { margin: 0; font-size: 20px; font-weight: 600; }
+.logout-btn {
+  background: #EF4444; border: none; color: white; padding: 8px 16px;
+  border-radius: 6px; cursor: pointer; font-size: 13px;
+}
+
+.container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+
+/* CARDS */
+.card {
+  background: var(--white); border-radius: 12px; padding: 24px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 24px;
+}
+
+/* LOGIN */
+.login-box { max-width: 400px; margin: 100px auto; text-align: center; }
+input {
+  width: 100%; padding: 12px; margin-top: 10px; border: 1px solid var(--border);
+  border-radius: 8px; box-sizing: border-box;
+}
+.btn-login {
+  width: 100%; padding: 12px; margin-top: 20px; background: var(--secondary);
+  color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
+}
+
+/* DASHBOARD TABLE */
+.table-container { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; min-width: 900px; }
+th { background: #F8FAFC; color: #64748B; font-weight: 600; text-transform: uppercase; font-size: 12px; padding: 16px; text-align: left; }
+td { padding: 16px; border-top: 1px solid var(--border); font-size: 14px; vertical-align: middle; }
+tr:hover { background: #F8FAFC; }
+
+/* STATUS DROPDOWN */
+.status-select {
+  padding: 6px 10px; border-radius: 20px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; appearance: none;
+}
+.status-select.Pending { background: #FEF3C7; color: #D97706; } /* Yellow */
+.status-select.Confirmed { background: #DBEAFE; color: #1E40AF; } /* Blue */
+.status-select.Completed { background: #DCFCE7; color: #166534; } /* Green */
+.status-select.Cancelled { background: #FEE2E2; color: #991B1B; } /* Red */
+
+/* WORKER SELECT */
+.worker-select {
+  padding: 8px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; color: #333; width: 100%;
+}
+
+/* UTILS */
+.hidden { display: none !important; }
+.map-link {
+  color: #2563EB; text-decoration: none; font-size: 13px; font-weight: 500;
+  display: inline-flex; align-items: center; gap: 4px; background: #EFF6FF; padding: 4px 8px; border-radius: 4px;
+}
+.grocery-badge {
+  font-size: 11px; background: #F3F4F6; padding: 2px 6px; border-radius: 4px; color: #555; display: inline-block; margin-top: 4px; border: 1px solid #ddd;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h2>TaskNest Admin</h2>
+  <button id="logoutBtn" class="logout-btn hidden" onclick="logout()">Logout</button>
+</header>
+
+<div class="container">
+
+  <div class="card login-box" id="loginCard">
+    <h3>Admin Access</h3>
+    <p style="font-size:12px; color:#666;">Login to manage bookings</p>
+    <input id="email" type="email" placeholder="admin@example.com">
+    <input id="password" type="password" placeholder="Password">
+    <button class="btn-login" onclick="login()">Login</button>
+  </div>
+
+  <div class="hidden" id="dashboard">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h3 style="margin:0;">Recent Bookings</h3>
+      <button onclick="loadBookings()" style="background:white; border:1px solid #ccc; padding:8px 12px; border-radius:6px; cursor:pointer;">↻ Refresh List</button>
+    </div>
+
+    <div class="card table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Customer Info</th>
+            <th>Service Details</th>
+            <th>Location</th>
+            <th>Date & Time</th>
+            <th>Status</th>
+            <th>Assign Worker</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <tr><td colspan="6" style="text-align:center;">Loading data...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getFirestore, collection, getDocs, updateDoc, doc, query, orderBy } 
+from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+// --- YOUR REAL CONFIGURATION ---
+const firebaseConfig = {
+  apiKey: "AIzaSyDgYTocBZ_JNTtqT_M1w8cX-WkiY9sSW3w",
+  authDomain: "tasknest-test.firebaseapp.com",
+  projectId: "tasknest-test",
+  storageBucket: "tasknest-test.firebasestorage.app",
+  messagingSenderId: "162770306478",
+  appId: "1:162770306478:web:8a4150a374eaf7ec03b43f"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app, "tasknest");
+const auth = getAuth(app);
+
+// AUTH LISTENER
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    document.getElementById('loginCard').classList.add('hidden');
+    document.getElementById('dashboard').classList.remove('hidden');
+    document.getElementById('logoutBtn').classList.remove('hidden');
+    loadBookings();
+  } else {
+    document.getElementById('loginCard').classList.remove('hidden');
+    document.getElementById('dashboard').classList.add('hidden');
+    document.getElementById('logoutBtn').classList.add('hidden');
+  }
+});
+
+// LOGIN FUNCTION
+window.login = async () => {
+  const email = document.getElementById('email').value;
+  const pass = document.getElementById('password').value;
+  if(!email || !pass) { alert("Please enter email and password"); return; }
+  
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) { 
+    alert("Login Failed: " + e.message); 
+    console.error(e);
+  }
+};
+
+// LOGOUT FUNCTION
+window.logout = async () => {
+  await signOut(auth);
+  location.reload();
+};
+
+// LOAD BOOKINGS
+window.loadBookings = async () => {
+  const tableBody = document.getElementById('tableBody');
+  tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Loading...</td></tr>';
+  
+  try {
+    // Fetch all bookings (Using simple collection fetch)
+    const snap = await getDocs(collection(db, "bookings"));
+    tableBody.innerHTML = "";
+
+    if(snap.empty) {
+      tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">No bookings found.</td></tr>';
+      return;
+    }
+
+    snap.forEach(docSnap => {
+      const b = docSnap.data();
+      const tr = document.createElement("tr");
+
+      // Logic for Map Link (Priority: Coords > Address)
+      let mapUrl = `https://www.google.com/maps?q=${encodeURIComponent(b.address)}`;
+      let mapText = "View Address";
+      
+      if(b.latitude && b.latitude !== "Not Shared") {
+        // Uses Exact Pin
+        mapUrl = `https://www.google.com/maps?q=${b.latitude},${b.longitude}`;
+        mapText = "📍 Exact Pin";
+      }
+
+      // Check Status for Color
+      const statusClass = b.status ? b.status.split(" ")[0] : "Pending"; // Matches first word for CSS
+
+      tr.innerHTML = `
+        <td>
+          <div style="font-weight:600;">${b.name}</div>
+          <div style="font-size:12px; color:#666;">${b.phone}</div>
+        </td>
+        
+        <td>
+          <div style="color:var(--secondary); font-weight:500;">${b.service}</div>
+          <div style="font-weight:bold; font-size:12px;">₹${b.amount}</div>
+          ${b.grocery ? `<div class="grocery-badge">${b.grocery}</div>` : ''}
+        </td>
+        
+        <td>
+          <a href="${mapUrl}" target="_blank" class="map-link">${mapText}</a>
+          <div style="font-size:11px; color:#888; max-width:200px; margin-top:5px;">
+            ${b.address}
+          </div>
+        </td>
+        
+        <td>
+          <div>${b.date}</div>
+          <div style="font-size:12px; color:#666;">${b.timeSlot}</div>
+        </td>
+        
+        <td>
+          <select onchange="updateStatus('${docSnap.id}', this.value)" class="status-select ${statusClass}">
+            <option value="Payment Verification Pending" ${b.status && b.status.includes("Pending")?"selected":""}>Pending</option>
+            <option value="Confirmed" ${b.status=="Confirmed"?"selected":""}>Confirmed</option>
+            <option value="Completed" ${b.status=="Completed"?"selected":""}>Completed</option>
+            <option value="Cancelled" ${b.status=="Cancelled"?"selected":""}>Cancelled</option>
+          </select>
+        </td>
+        
+        <td>
+          <select class="worker-select" onchange="assignWorker('${docSnap.id}', this.value)">
+            <option value="">-- Assign --</option>
+            <option value="worker1@test.com" ${b.worker=="worker1@test.com"?"selected":""}>Worker 1</option>
+            <option value="worker2@test.com" ${b.worker=="worker2@test.com"?"selected":""}>Worker 2</option>
+          </select>
+        </td>
+      `;
+      tableBody.appendChild(tr);
+    });
+
+  } catch(e) {
+    console.error(e);
+    tableBody.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center;">Error: ${e.message}</td></tr>`;
+  }
+};
+
+// UPDATE STATUS
+window.updateStatus = async (id, val) => {
+    try {
+        await updateDoc(doc(db, "bookings", id), { status: val });
+        // Don't alert, just refresh silently or change color
+        loadBookings(); 
+    } catch(e) {
+        alert("Error updating status");
+    }
+};
+
+// ASSIGN WORKER
+window.assignWorker = async (id, val) => {
+    try {
+        await updateDoc(doc(db, "bookings", id), { worker: val });
+        alert("Worker assigned successfully!");
+    } catch(e) {
+        alert("Error assigning worker");
+    }
+};
+</script>
+
+</body>
+</html>

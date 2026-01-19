@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskNest – Partner App</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* --- GLOBAL STYLES --- */
+:root {
+  --primary: #0F172A;     /* Dark Navy */
+  --secondary: #2F6F73;   /* Teal */
+  --bg: #F3F4F6;
+  --card-bg: #FFFFFF;
+  --text: #334155;
+  --accent: #3B82F6;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding-bottom: 40px;
+}
+
+/* HEADER */
+header {
+  background: var(--primary);
+  color: white;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+header h2 { margin: 0; font-size: 18px; font-weight: 600; }
+.logout-btn {
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* LOGIN CARD */
+.login-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 30px;
+  margin-top: 50px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  text-align: center;
+}
+
+/* INPUTS & BUTTONS */
+input {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  border: 1px solid #E2E8F0;
+  border-radius: 10px;
+  font-size: 14px;
+  box-sizing: border-box;
+  background: #F8FAFC;
+}
+input:focus { outline: none; border-color: var(--secondary); background: #fff; }
+
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  margin-top: 20px;
+  background: var(--secondary);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(47, 111, 115, 0.2);
+}
+
+/* JOB CARDS */
+.job-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border: 1px solid #E2E8F0;
+  position: relative;
+}
+
+.job-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  border-bottom: 1px solid #F1F5F9; padding-bottom: 10px; margin-bottom: 10px;
+}
+.job-service { font-size: 16px; font-weight: 700; color: var(--primary); }
+.job-date { font-size: 12px; color: #64748B; display: block; margin-top: 2px; }
+
+/* Status Badge */
+.badge { font-size: 11px; padding: 4px 8px; border-radius: 6px; font-weight: 600; text-transform: uppercase; }
+.badge.Pending { background: #FEF3C7; color: #D97706; }
+.badge.Completed { background: #DCFCE7; color: #166534; }
+
+/* Job Details */
+.detail-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; font-size: 14px; color: #475569; }
+.icon { width: 18px; height: 18px; color: var(--secondary); opacity: 0.8; flex-shrink: 0; margin-top: 2px;}
+
+/* Grocery Highlight */
+.grocery-box {
+  background: #EFF6FF; border: 1px dashed #3B82F6; padding: 10px; border-radius: 8px;
+  font-size: 13px; color: #1E40AF; margin: 10px 0; display: flex; align-items: center; gap: 8px;
+}
+
+/* Actions */
+.action-row { display: flex; gap: 10px; margin-top: 15px; }
+
+.btn-action {
+  flex: 1; padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 600;
+  text-align: center; text-decoration: none; cursor: pointer; border: none;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-map { background: #E0F2FE; color: #0284C7; }
+.btn-call { background: #F0FDF4; color: #16A34A; }
+.btn-complete { background: var(--primary); color: white; width: 100%; margin-top: 15px; }
+
+.hidden { display: none !important; }
+
+</style>
+</head>
+<body>
+
+<header>
+  <h2>TaskNest Partner</h2>
+  <button id="logoutBtn" class="logout-btn hidden" onclick="logout()">Logout</button>
+</header>
+
+<div class="container">
+
+  <div class="login-card" id="loginCard">
+    <h3>Worker Login</h3>
+    <p style="color:#666; font-size:13px; margin-bottom:20px;">Enter your email to view jobs.</p>
+    
+    <input id="email" type="email" placeholder="Email Address">
+    <input id="password" type="password" placeholder="Password">
+    
+    <button class="btn-primary" onclick="login()">Login</button>
+  </div>
+
+  <div class="hidden" id="dashboard">
+    <h3 style="margin-top:0; color:#64748B; font-size:16px;">Assigned Jobs</h3>
+    <div id="jobs"></div>
+  </div>
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getFirestore, collection, getDocs, updateDoc, doc, query, where } 
+from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } 
+from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+// --- YOUR REAL CONFIGURATION ---
+const firebaseConfig = {
+  apiKey: "AIzaSyDgYTocBZ_JNTtqT_M1w8cX-WkiY9sSW3w",
+  authDomain: "tasknest-test.firebaseapp.com",
+  projectId: "tasknest-test",
+  storageBucket: "tasknest-test.firebasestorage.app",
+  messagingSenderId: "162770306478",
+  appId: "1:162770306478:web:8a4150a374eaf7ec03b43f"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app, "tasknest");
+const auth = getAuth(app);
+
+// AUTH LISTENER
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    document.getElementById('loginCard').classList.add('hidden');
+    document.getElementById('dashboard').classList.remove('hidden');
+    document.getElementById('logoutBtn').classList.remove('hidden');
+    loadJobs(user.email);
+  } else {
+    document.getElementById('loginCard').classList.remove('hidden');
+    document.getElementById('dashboard').classList.add('hidden');
+    document.getElementById('logoutBtn').classList.add('hidden');
+  }
+});
+
+// LOGIN
+window.login = async () => {
+  const email = document.getElementById('email').value;
+  const pass = document.getElementById('password').value;
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch (e) {
+    alert("Login Failed: " + e.message);
+  }
+};
+
+// LOGOUT
+window.logout = async () => {
+  await signOut(auth);
+  location.reload();
+};
+
+// LOAD JOBS
+window.loadJobs = async (workerEmail) => {
+  const jobsDiv = document.getElementById('jobs');
+  jobsDiv.innerHTML = '<p style="text-align:center;color:#888;margin-top:40px;">Loading jobs...</p>';
+
+  // Query: Get bookings where 'worker' field matches logged in email
+  const q = query(collection(db, "bookings"), where("worker", "==", workerEmail));
+  
+  try {
+    const snap = await getDocs(q);
+    jobsDiv.innerHTML = "";
+
+    if (snap.empty) {
+      jobsDiv.innerHTML = `
+        <div style="text-align:center; padding:40px; color:#94a3b8;">
+          <div style="font-size:40px; margin-bottom:10px;">☕</div>
+          No active jobs assigned to you.
+        </div>`;
+      return;
+    }
+
+    snap.forEach(docSnap => {
+      const b = docSnap.data();
+      const jobId = docSnap.id;
+      
+      const statusClass = b.status && b.status.includes("Completed") ? "Completed" : "Pending";
+
+      // Map Link Logic
+      let mapLink = `https://maps.google.com/maps?q=$1{encodeURIComponent(b.address)}`;
+      let mapText = "Navigate (Address)";
+      
+      if(b.latitude && b.latitude !== "Not Shared") {
+        mapLink = `https://maps.google.com/maps?q=$1{b.latitude},${b.longitude}`;
+        mapText = "Navigate (Exact Pin)";
+      }
+
+      // Grocery Logic
+      let groceryHtml = '';
+      if(b.grocery && b.grocery.includes("Option 2")) {
+        groceryHtml = `<div class="grocery-box">🛒 <b>Action Required:</b> Buy Ingredients (Bill Extra)</div>`;
+      } else if (b.grocery) {
+        groceryHtml = `<div class="grocery-box" style="background:#F0FDF4; border-color:#22C55E; color:#15803D;">✅ Customer will provide ingredients</div>`;
+      }
+
+      const card = document.createElement("div");
+      card.className = "job-card";
+      
+      card.innerHTML = `
+        <div class="job-header">
+          <div>
+            <div class="job-service">${b.service}</div>
+            <span class="job-date">📅 ${b.date} • ⏰ ${b.timeSlot}</span>
+          </div>
+          <span class="badge ${statusClass}">${b.status || 'Pending'}</span>
+        </div>
+
+        <div class="detail-row">
+          <span style="font-weight:600;">👤 ${b.name}</span>
+        </div>
+
+        <div class="detail-row">
+          <span>📍 ${b.address}</span>
+        </div>
+
+        ${groceryHtml}
+
+        <div class="action-row">
+          <a href="${mapLink}" target="_blank" class="btn-action btn-map">
+            ${mapText}
+          </a>
+          <a href="tel:${b.phone}" class="btn-action btn-call">
+            📞 Call Customer
+          </a>
+        </div>
+
+        ${b.status !== "Completed" ? 
+          `<button onclick="completeJob('${jobId}')" class="btn-action btn-complete">
+             Mark as Completed
+           </button>` : 
+          `<div style="text-align:center; margin-top:15px; font-size:12px; color:green; font-weight:600;">
+             Job Finished ✓
+           </div>`
+        }
+      `;
+
+      jobsDiv.appendChild(card);
+    });
+
+  } catch(e) {
+    jobsDiv.innerHTML = `<p style="color:red; text-align:center;">Error: ${e.message}</p>`;
+  }
+};
+
+// MARK COMPLETE
+window.completeJob = async (id) => {
+  if(!confirm("Are you sure you finished this job?")) return;
+  
+  try {
+    await updateDoc(doc(db, "bookings", id), { status: "Completed" });
+    // Reload local data
+    const user = auth.currentUser;
+    if(user) loadJobs(user.email);
+  } catch(e) {
+    alert("Error updating: " + e.message);
+  }
+};
+</script>
+
+</body>
+</html>

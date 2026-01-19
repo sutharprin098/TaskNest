@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskNest - Home Cooking</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* --- GLOBAL STYLES --- */
+:root {
+  --primary: #FF6B6B;
+  --secondary: #2F6F73;
+  --bg: #F3F4F6;
+  --white: #FFFFFF;
+  --text: #1F2937;
+  --success: #25D366;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-tap-highlight-color: transparent;
+  padding-bottom: 40px;
+}
+
+header {
+  background: var(--white);
+  padding: 16px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--secondary);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.container {
+  max-width: 450px;
+  margin: 20px auto;
+  padding: 0 16px;
+}
+
+/* CARDS */
+.card {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+h2 { margin: 0 0 10px 0; font-size: 22px; color: var(--secondary); }
+p { margin: 0 0 15px 0; color: #666; font-size: 14px; line-height: 1.5; }
+
+/* INPUTS & BUTTONS */
+input, select, textarea {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  background: #F9FAFB;
+  font-family: inherit;
+  font-size: 14px;
+  box-sizing: border-box;
+  margin-top: 8px;
+}
+input:focus, select:focus, textarea:focus { outline: none; border-color: var(--secondary); background: #fff; }
+
+label { font-size: 13px; font-weight: 600; color: #555; display: block; margin-top: 15px; }
+
+button {
+  width: 100%;
+  padding: 16px;
+  margin-top: 20px;
+  background: var(--secondary);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+button:active { transform: scale(0.98); }
+
+.secondary-btn {
+  background: white;
+  color: var(--secondary);
+  border: 2px solid var(--secondary);
+  margin-top: 12px;
+}
+
+/* UTILS */
+.hidden { display: none !important; }
+.badge { background: #FFEDD5; color: #C2410C; font-size: 11px; padding: 4px 8px; border-radius: 6px; font-weight: 600; float: right; }
+.service-img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; margin-bottom: 16px; background-color: #eee; }
+
+/* GROCERY OPTIONS */
+.grocery-opt {
+  border: 1px solid #E5E7EB;
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+  margin-top: 5px;
+}
+.grocery-opt.active {
+  background: #E0F2F1;
+  border-color: var(--secondary);
+}
+.radio-circle {
+  height: 16px; width: 16px; border: 2px solid #ccc; border-radius: 50%;
+  display: inline-block; margin-right: 8px; vertical-align: middle;
+}
+.grocery-opt.active .radio-circle {
+  border-color: var(--secondary); background: var(--secondary);
+}
+
+/* MAP & LOCATION */
+iframe { width: 100%; height: 160px; border: 0; border-radius: 10px; background: #eee; margin-top: 8px;}
+.loc-btn { background: #E0F2F1; color: var(--secondary); margin-top: 5px; padding: 10px; font-size: 14px; }
+
+/* HISTORY ITEMS */
+.history-item {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+.history-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+.status-pill { font-size: 11px; padding: 4px 8px; border-radius: 12px; font-weight: 600; }
+.st-Pending { background: #FEF3C7; color: #D97706; }   /* Yellow */
+.st-Confirmed { background: #DBEAFE; color: #1E40AF; } /* Blue */
+.st-Completed { background: #DCFCE7; color: #166534; } /* Green */
+.st-Cancelled { background: #FEE2E2; color: #991B1B; } /* Red */
+
+</style>
+</head>
+<body>
+
+<header>TaskNest</header>
+
+<div class="container">
+
+  <div class="card" id="step1">
+    <h2>Welcome Back 👋</h2>
+    <p>Enter your mobile number to view services and your booking history.</p>
+    
+    <label>Mobile Number</label>
+    <input type="tel" id="loginPhone" placeholder="Enter 10-digit number" maxlength="10">
+    
+    <button onclick="handleLogin()">Continue</button>
+  </div>
+
+  <div class="card hidden" id="stepInfo">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <h2 style="margin:0;">Home Cooking</h2>
+      <span class="badge">₹499 / Visit</span>
+    </div>
+    <p>Premium occasional cooking service.</p>
+    
+    <ul style="padding-left: 20px; color: #555; line-height: 1.8; font-size:14px; margin-top:0;">
+      <li>Hygienic & Professional Cooks</li>
+      <li>Fixed Menu (Dal, Rice, Roti, Seasonal Veg)</li>
+      <li>Background Verified Staff</li>
+    </ul>
+    
+    <button onclick="goToBooking()">Book New Service</button>
+    <button onclick="showHistory()" class="secondary-btn">📂 My Bookings</button>
+    <button onclick="logout()" style="background:none; color:#666; font-size:13px; margin-top:10px; border:none; padding:5px;">Logout</button>
+  </div>
+
+  <div class="card hidden" id="stepHistory">
+    <h2>My Bookings</h2>
+    <div id="historyList">
+      <p style="text-align:center; color:#888;">Loading...</p>
+    </div>
+    <button onclick="backToDash()" class="secondary-btn">← Back to Dashboard</button>
+  </div>
+
+  <div class="card hidden" id="stepBooking">
+    
+    <img src="D:\TaskNest (test)\cooking.jpg" 
+         onerror="this.src='https://images.unsplash.com/photo-1556910103-1c02745a30bf?auto=format&fit=crop&w=800&q=80'" 
+         class="service-img" alt="Cooking Service">
+    
+    <h2>Book Your Cook</h2>
+    
+    <label>Grocery Arrangement</label>
+    <div class="grocery-opt active" onclick="selectGrocery(1)" id="opt1">
+      <span class="badge">Recommended</span>
+      <div style="font-weight:600; font-size:14px;">
+        <span class="radio-circle"></span> I will provide ingredients
+      </div>
+      <div style="font-size:12px; color:#666; margin-left:28px;">No extra charge.</div>
+    </div>
+
+    <div class="grocery-opt" onclick="selectGrocery(2)" id="opt2">
+      <div style="font-weight:600; font-size:14px;">
+        <span class="radio-circle"></span> Cook brings ingredients
+      </div>
+      <div style="font-size:12px; color:#666; margin-left:28px;">You pay grocery bill (actuals).</div>
+    </div>
+
+    <label>Location</label>
+    <div style="background:#F9FAFB; padding:10px; border-radius:12px; border:1px solid #E5E7EB; margin-top:8px;">
+      <iframe id="mapFrame" src="https://maps.google.com/maps?q=Delhi&t=&z=13&ie=UTF8&iwloc=&output=embed"></iframe>
+      <button class="loc-btn" onclick="detectLocation()">📍 Detect My Location</button>
+      <textarea id="address" placeholder="House No, Floor, Landmark..." rows="2" style="background:white;"></textarea>
+      <div id="locStatus" style="font-size:11px; color:green; margin-top:5px;"></div>
+    </div>
+
+    <label>Full Name</label>
+    <input type="text" id="name" placeholder="Your Name">
+
+    <label>Date & Time</label>
+    <div style="display:flex; gap:10px;">
+      <input type="date" id="date">
+      <select id="timeSlot"></select>
+    </div>
+
+    <button onclick="goToPayment()">Proceed to Pay ₹499</button>
+    <button onclick="backToDash()" class="secondary-btn">Cancel</button>
+  </div>
+
+  <div class="card hidden" id="stepPayment">
+    <div style="text-align:center;">
+      <h2>Payment</h2>
+      <p>Scan to pay booking advance</p>
+      
+      <div style="margin:20px auto; width:180px; padding:10px; border:1px solid #eee; border-radius:12px;">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=9509706699@axl&pn=TaskNest&am=499" 
+             style="width:100%; height:100%;" alt="UPI QR">
+      </div>
+      
+      <h1 style="color:var(--secondary); margin:10px 0;">₹499</h1>
+      <p style="font-size:13px; background:#f0f0f0; display:inline-block; padding:5px 12px; border-radius:20px; color:#555;">
+        UPI: 9509706699@axl
+      </p>
+    </div>
+
+    <button onclick="confirmAndWhatsApp()" style="background:#25D366;">
+      <span style="font-size:18px; vertical-align:middle; margin-right:5px;">📱</span> 
+      Send Screenshot & Book
+    </button>
+    <button onclick="document.getElementById('stepPayment').classList.add('hidden'); document.getElementById('stepBooking').classList.remove('hidden');" class="secondary-btn">Back</button>
+  </div>
+
+  <div class="card hidden" id="stepSuccess" style="text-align:center; padding-top:40px;">
+    <div style="width:70px; height:70px; background:#25D366; color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:35px; margin:0 auto 20px auto;">✓</div>
+    <h2>Booking Requested!</h2>
+    <p>We are verifying your payment on WhatsApp.</p>
+    
+    <div style="background:#F0FDF4; padding:15px; border-radius:10px; margin:20px 0; text-align:left;">
+      <p style="margin:5px 0; color:#166534; font-size:13px;"><b>Status:</b> Payment Verification Pending</p>
+      <p style="margin:5px 0; color:#166534; font-size:13px;">You will receive a confirmation shortly.</p>
+    </div>
+
+    <button onclick="showHistory()" style="background:var(--secondary);">View My Bookings</button>
+    <button onclick="location.reload()" class="secondary-btn">Home</button>
+  </div>
+
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+  // --- REAL CONFIGURATION ---
+  const firebaseConfig = {
+    apiKey: "AIzaSyDgYTocBZ_JNTtqT_M1w8cX-WkiY9sSW3w",
+    authDomain: "tasknest-test.firebaseapp.com",
+    projectId: "tasknest-test",
+    storageBucket: "tasknest-test.firebasestorage.app",
+    messagingSenderId: "162770306478",
+    appId: "1:162770306478:web:8a4150a374eaf7ec03b43f"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  // --- DATABASE CONNECTED TO 'tasknest' ---
+  const db = getFirestore(app, "tasknest");
+
+  // Global State
+  window.userLat = "Not Shared";
+  window.userLng = "Not Shared";
+  window.groceryChoice = "Option 1: Customer will provide ingredients"; 
+
+  // --- 1. SHOW HISTORY FUNCTION ---
+  window.showHistory = async () => {
+    // UI Navigation
+    hideAll();
+    document.getElementById('stepHistory').classList.remove('hidden');
+
+    const phone = document.getElementById('loginPhone').value;
+    const listDiv = document.getElementById('historyList');
+    listDiv.innerHTML = '<p style="text-align:center; margin-top:20px;">Loading records...</p>';
+
+    try {
+        // Query Database
+        const q = query(collection(db, "bookings"), where("phone", "==", phone));
+        const snap = await getDocs(q);
+
+        if(snap.empty) {
+            listDiv.innerHTML = `
+              <div style="text-align:center; padding:30px; color:#888;">
+                <div style="font-size:40px; margin-bottom:10px;">📂</div>
+                No bookings found for this number.
+              </div>`;
+            return;
+        }
+
+        listDiv.innerHTML = ""; // Clear loader
+        
+        snap.forEach(doc => {
+            const data = doc.data();
+            
+            // Determine Status Color
+            let stClass = "st-Pending";
+            if(data.status && data.status.includes("Confirmed")) stClass = "st-Confirmed";
+            if(data.status && data.status.includes("Completed")) stClass = "st-Completed";
+            if(data.status && data.status.includes("Cancelled")) stClass = "st-Cancelled";
+
+            // Create HTML Item
+            const item = `
+            <div class="history-item">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                    <div style="font-weight:600; color:#333;">${data.service}</div>
+                    <span class="status-pill ${stClass}">${data.status || 'Pending'}</span>
+                </div>
+                <div style="font-size:13px; color:#555;">
+                    📅 ${data.date}   ⏰ ${data.timeSlot}
+                </div>
+                <div style="font-size:12px; color:#888; margin-top:4px;">
+                   📍 ${data.address}
+                </div>
+            </div>`;
+            listDiv.innerHTML += item;
+        });
+
+    } catch(e) {
+        listDiv.innerHTML = `<p style="color:red; text-align:center;">Error: ${e.message}</p>`;
+        console.error(e);
+    }
+  };
+
+  // --- 2. BOOKING & WHATSAPP FUNCTION ---
+  window.confirmAndWhatsApp = () => {
+    const phone = document.getElementById('loginPhone').value;
+    const name = document.getElementById('name').value;
+    const date = document.getElementById('date').value;
+    const time = document.getElementById('timeSlot').value;
+    const address = document.getElementById('address').value;
+
+    // Switch to Success Screen
+    hideAll();
+    document.getElementById('stepSuccess').classList.remove('hidden');
+    window.scrollTo(0,0);
+
+    // Open WhatsApp
+    const waMsg = `*New Booking Request*%0A%0AUser: ${name}%0APhone: ${phone}%0ADate: ${date} (${time})%0AAddress: ${address}%0A%0A*Grocery:* ${window.groceryChoice}%0A*Location:* ${window.userLat}, ${window.userLng}%0A%0A*Attaching Payment (₹499) Screenshot...* 👇`;
+    window.open(`https://wa.me/919509706699?text=${waMsg}`, '_blank');
+
+    // Save to Database
+    const booking = {
+      phone, name, address, date, timeSlot: time,
+      latitude: window.userLat, longitude: window.userLng,
+      service: "Occasional Home Cooking", 
+      grocery: window.groceryChoice,
+      amount: 499, 
+      status: "Payment Verification Pending", 
+      timestamp: new Date()
+    };
+
+    addDoc(collection(db, "bookings"), booking)
+      .then(() => console.log("Booking saved successfully"))
+      .catch((e) => console.error("Error saving booking:", e));
+  };
+</script>
+
+<script>
+  // --- UI NAVIGATION LOGIC ---
+
+  function hideAll() {
+    document.getElementById('step1').classList.add('hidden');
+    document.getElementById('stepInfo').classList.add('hidden');
+    document.getElementById('stepBooking').classList.add('hidden');
+    document.getElementById('stepPayment').classList.add('hidden');
+    document.getElementById('stepSuccess').classList.add('hidden');
+    document.getElementById('stepHistory').classList.add('hidden');
+  }
+
+  // 1. Login
+  function handleLogin() {
+    const ph = document.getElementById('loginPhone').value;
+    if(ph.length !== 10) { alert("Please enter a valid 10-digit number"); return; }
+    
+    // Save phone to local storage (optional, for persistence)
+    localStorage.setItem('userPhone', ph);
+    
+    hideAll();
+    document.getElementById('stepInfo').classList.remove('hidden');
+  }
+
+  // 2. Go to Booking
+  function goToBooking() {
+    hideAll();
+    document.getElementById('stepBooking').classList.remove('hidden');
+    generateSlots();
+    window.scrollTo(0,0);
+  }
+
+  // 3. Back to Dashboard
+  function backToDash() {
+    hideAll();
+    document.getElementById('stepInfo').classList.remove('hidden');
+  }
+
+  // 4. Logout
+  function logout() {
+    document.getElementById('loginPhone').value = "";
+    hideAll();
+    document.getElementById('step1').classList.remove('hidden');
+  }
+
+  // 5. Grocery Selection
+  function selectGrocery(option) {
+    document.getElementById('opt1').classList.remove('active');
+    document.getElementById('opt2').classList.remove('active');
+    document.getElementById('opt'+option).classList.add('active');
+    
+    if(option === 1) window.groceryChoice = "Customer will provide ingredients";
+    else window.groceryChoice = "Cook brings ingredients (Bill Extra)";
+  }
+
+  // 6. Go to Payment
+  function goToPayment() {
+    const name = document.getElementById('name').value;
+    const date = document.getElementById('date').value;
+    const address = document.getElementById('address').value;
+
+    if(!name || !date || !address) {
+      alert("Please fill Name, Address and Date."); return;
+    }
+    hideAll();
+    document.getElementById('stepPayment').classList.remove('hidden');
+    window.scrollTo(0,0);
+  }
+
+  // 7. Location Detection
+  function detectLocation() {
+    const status = document.getElementById('locStatus');
+    const mapFrame = document.getElementById('mapFrame');
+    
+    if (!navigator.geolocation) { status.innerText = "Geo not supported"; return; }
+    status.innerText = "Locating...";
+    
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        window.userLat = pos.coords.latitude;
+        window.userLng = pos.coords.longitude;
+        status.innerText = `Matched: ${window.userLat.toFixed(4)}, ${window.userLng.toFixed(4)}`;
+        mapFrame.src = `https://maps.google.com/maps?q=Delhi&t=&z=13&ie=UTF8&iwloc=&output=embed4{window.userLat},${window.userLng}&z=15&output=embed`;
+      },
+      (err) => { status.innerText = "Location access denied."; status.style.color = "red"; }
+    );
+  }
+
+  // 8. Time Slots
+  function generateSlots() {
+    const sel = document.getElementById('timeSlot');
+    sel.innerHTML = "";
+    // Generate slots from 10 AM to 8 PM
+    for(let i=10; i<=20; i++) {
+      let time = (i>12 ? i-12 : i) + (i>=12 ? " PM" : " AM");
+      let opt = document.createElement('option');
+      opt.value = time; opt.innerText = time;
+      sel.appendChild(opt);
+    }
+  }
+</script>
+
+</body>
+</html>
