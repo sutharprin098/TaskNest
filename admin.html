@@ -4,24 +4,41 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TaskNest – Admin Panel</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 /* --- STYLES --- */
 :root {
-  --primary: #0F172A;
-  --secondary: #2F6F73;
-  --bg: #F1F5F9;
+  --primary: #0B1320;
+  --secondary: #1E6A64;
+  --bg: #EEF2F6;
   --white: #ffffff;
-  --border: #E2E8F0;
+  --border: #DDE4EE;
+  --muted: #64748B;
+  --accent: #F59E0B;
 }
 
-body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg); color: #334155; }
+body {
+  margin: 0;
+  font-family: 'Source Sans 3', sans-serif;
+  background: linear-gradient(180deg, #F8FAFC 0%, #EEF2F6 100%);
+  color: #1F2937;
+}
+
+.page-wrap {
+  min-height: 100vh;
+  background-image: radial-gradient(rgba(30, 106, 100, 0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
 
 /* HEADER */
 header {
-  background: var(--primary); color: white; padding: 16px 24px;
-  display: flex; justify-content: space-between; align-items: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background: var(--primary);
+  color: white;
+  padding: 18px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
 header h2 { margin: 0; font-size: 20px; font-weight: 600; }
 .logout-btn {
@@ -29,12 +46,61 @@ header h2 { margin: 0; font-size: 20px; font-weight: 600; }
   border-radius: 6px; cursor: pointer; font-size: 13px;
 }
 
-.container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+.container { max-width: 1200px; margin: 28px auto; padding: 0 20px; }
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.page-title {
+  margin: 0;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.page-sub {
+  margin: 6px 0 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.btn {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.btn.primary {
+  background: var(--secondary);
+  color: white;
+  box-shadow: 0 8px 18px rgba(30, 106, 100, 0.25);
+}
+
+.btn.ghost {
+  background: white;
+  color: #0F172A;
+  border: 1px solid var(--border);
+}
+
+.btn:active { transform: scale(0.98); }
 
 /* CARDS */
 .card {
   background: var(--white); border-radius: 12px; padding: 24px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 24px;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08); margin-bottom: 24px;
+  border: 1px solid var(--border);
 }
 
 /* LOGIN */
@@ -49,11 +115,66 @@ input {
 }
 
 /* DASHBOARD TABLE */
-.table-container { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
-table { width: 100%; border-collapse: collapse; min-width: 900px; }
-th { background: #F8FAFC; color: #64748B; font-weight: 600; text-transform: uppercase; font-size: 12px; padding: 16px; text-align: left; }
+.table-container { overflow-x: auto; border-radius: 14px; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; min-width: 980px; background: white; }
+th {
+  background: #F8FAFC;
+  color: #64748B;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 11px;
+  padding: 16px;
+  text-align: left;
+  letter-spacing: 0.8px;
+}
 td { padding: 16px; border-top: 1px solid var(--border); font-size: 14px; vertical-align: middle; }
 tr:hover { background: #F8FAFC; }
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.toolbar-left { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+.search-box input {
+  width: 260px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  font-size: 13px;
+  background: #F8FAFC;
+}
+
+.filter-select {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: white;
+  font-size: 13px;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+}
+
+.stat-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.stat-value { font-size: 20px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; }
 
 /* STATUS DROPDOWN */
 .status-select {
@@ -82,6 +203,8 @@ tr:hover { background: #F8FAFC; }
 </head>
 <body>
 
+<div class="page-wrap">
+
 <header>
   <h2>TaskNest Admin</h2>
   <button id="logoutBtn" class="logout-btn hidden" onclick="logout()">Logout</button>
@@ -98,9 +221,49 @@ tr:hover { background: #F8FAFC; }
   </div>
 
   <div class="hidden" id="dashboard">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-      <h3 style="margin:0;">Recent Bookings</h3>
-      <button onclick="loadBookings()" style="background:white; border:1px solid #ccc; padding:8px 12px; border-radius:6px; cursor:pointer;">↻ Refresh List</button>
+    <div class="dashboard-header">
+      <div>
+        <h3 class="page-title">Bookings Dashboard</h3>
+        <p class="page-sub">Manage status, assign workers, export data.</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn ghost" onclick="loadBookings()">Refresh</button>
+        <button class="btn primary" onclick="exportCsv()">Export CSV</button>
+      </div>
+    </div>
+
+    <div class="stats" id="statsRow">
+      <div class="stat-card">
+        <div class="stat-label">Total Bookings</div>
+        <div class="stat-value" id="statTotal">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pending</div>
+        <div class="stat-value" id="statPending">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Confirmed</div>
+        <div class="stat-value" id="statConfirmed">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Completed</div>
+        <div class="stat-value" id="statCompleted">0</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <div class="search-box">
+          <input id="searchInput" type="text" placeholder="Search name, phone, service">
+        </div>
+        <select id="statusFilter" class="filter-select" onchange="applyFilters()">
+          <option value="All">All Status</option>
+          <option value="Pending">Pending</option>
+          <option value="Confirmed">Confirmed</option>
+          <option value="Completed">Completed</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+      </div>
     </div>
 
     <div class="card table-container">
@@ -145,6 +308,8 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app, "tasknest");
 const auth = getAuth(app);
 
+let bookingsCache = [];
+
 // AUTH LISTENER
 onAuthStateChanged(auth, (user) => {
   if (user) {
@@ -187,78 +352,180 @@ window.loadBookings = async () => {
   try {
     // Fetch all bookings (Using simple collection fetch)
     const snap = await getDocs(collection(db, "bookings"));
-    tableBody.innerHTML = "";
-
-    if(snap.empty) {
-      tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">No bookings found.</td></tr>';
-      return;
-    }
+    bookingsCache = [];
 
     snap.forEach(docSnap => {
-      const b = docSnap.data();
-      const tr = document.createElement("tr");
-
-      // Logic for Map Link (Priority: Coords > Address)
-      let mapUrl = `https://www.google.com/maps?q=${encodeURIComponent(b.address)}`;
-      let mapText = "View Address";
-      
-      if(b.latitude && b.latitude !== "Not Shared") {
-        // Uses Exact Pin
-        mapUrl = `https://www.google.com/maps?q=${b.latitude},${b.longitude}`;
-        mapText = "📍 Exact Pin";
-      }
-
-      // Check Status for Color
-      const statusClass = b.status ? b.status.split(" ")[0] : "Pending"; // Matches first word for CSS
-
-      tr.innerHTML = `
-        <td>
-          <div style="font-weight:600;">${b.name}</div>
-          <div style="font-size:12px; color:#666;">${b.phone}</div>
-        </td>
-        
-        <td>
-          <div style="color:var(--secondary); font-weight:500;">${b.service}</div>
-          <div style="font-weight:bold; font-size:12px;">₹${b.amount}</div>
-          ${b.grocery ? `<div class="grocery-badge">${b.grocery}</div>` : ''}
-        </td>
-        
-        <td>
-          <a href="${mapUrl}" target="_blank" class="map-link">${mapText}</a>
-          <div style="font-size:11px; color:#888; max-width:200px; margin-top:5px;">
-            ${b.address}
-          </div>
-        </td>
-        
-        <td>
-          <div>${b.date}</div>
-          <div style="font-size:12px; color:#666;">${b.timeSlot}</div>
-        </td>
-        
-        <td>
-          <select onchange="updateStatus('${docSnap.id}', this.value)" class="status-select ${statusClass}">
-            <option value="Payment Verification Pending" ${b.status && b.status.includes("Pending")?"selected":""}>Pending</option>
-            <option value="Confirmed" ${b.status=="Confirmed"?"selected":""}>Confirmed</option>
-            <option value="Completed" ${b.status=="Completed"?"selected":""}>Completed</option>
-            <option value="Cancelled" ${b.status=="Cancelled"?"selected":""}>Cancelled</option>
-          </select>
-        </td>
-        
-        <td>
-          <select class="worker-select" onchange="assignWorker('${docSnap.id}', this.value)">
-            <option value="">-- Assign --</option>
-            <option value="worker1@test.com" ${b.worker=="worker1@test.com"?"selected":""}>Worker 1</option>
-            <option value="worker2@test.com" ${b.worker=="worker2@test.com"?"selected":""}>Worker 2</option>
-          </select>
-        </td>
-      `;
-      tableBody.appendChild(tr);
+      bookingsCache.push({ id: docSnap.id, ...docSnap.data() });
     });
+
+    bookingsCache.sort((a, b) => {
+      const aTime = a.timestamp && a.timestamp.seconds ? a.timestamp.seconds : 0;
+      const bTime = b.timestamp && b.timestamp.seconds ? b.timestamp.seconds : 0;
+      return bTime - aTime;
+    });
+
+    updateStats(bookingsCache);
+    applyFilters();
 
   } catch(e) {
     console.error(e);
     tableBody.innerHTML = `<tr><td colspan="6" style="color:red; text-align:center;">Error: ${e.message}</td></tr>`;
   }
+};
+
+window.applyFilters = () => {
+  const searchTerm = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+  const statusFilter = document.getElementById('statusFilter')?.value || 'All';
+
+  const filtered = bookingsCache.filter((b) => {
+    const status = (b.status || 'Pending').toLowerCase();
+    if (statusFilter !== 'All' && !status.includes(statusFilter.toLowerCase())) return false;
+
+    if (!searchTerm) return true;
+    const haystack = [b.name, b.phone, b.service, b.address]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+    return haystack.includes(searchTerm);
+  });
+
+  renderBookings(filtered);
+};
+
+const renderBookings = (list) => {
+  const tableBody = document.getElementById('tableBody');
+  tableBody.innerHTML = '';
+
+  if (!list.length) {
+    tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px;">No bookings found.</td></tr>';
+    return;
+  }
+
+  list.forEach((b) => {
+    const tr = document.createElement('tr');
+
+    let mapUrl = `https://www.google.com/maps?q=${encodeURIComponent(b.address || '')}`;
+    let mapText = 'View Address';
+
+    if (b.latitude && b.latitude !== 'Not Shared') {
+      mapUrl = `https://www.google.com/maps?q=${b.latitude},${b.longitude}`;
+      mapText = 'Exact Pin';
+    }
+
+    const statusClass = b.status ? b.status.split(' ')[0] : 'Pending';
+
+    tr.innerHTML = `
+      <td>
+        <div style="font-weight:600;">${b.name || '-'}</div>
+        <div style="font-size:12px; color:#666;">${b.phone || '-'}</div>
+      </td>
+      
+      <td>
+        <div style="color:var(--secondary); font-weight:600;">${b.service || '-'}</div>
+        <div style="font-weight:bold; font-size:12px;">₹${b.amount || '-'}</div>
+        ${b.grocery ? `<div class="grocery-badge">${b.grocery}</div>` : ''}
+      </td>
+      
+      <td>
+        <a href="${mapUrl}" target="_blank" class="map-link">${mapText}</a>
+        <div style="font-size:11px; color:#888; max-width:200px; margin-top:5px;">
+          ${b.address || '-'}
+        </div>
+      </td>
+      
+      <td>
+        <div>${b.date || '-'}</div>
+        <div style="font-size:12px; color:#666;">${b.timeSlot || '-'}</div>
+      </td>
+      
+      <td>
+        <select onchange="updateStatus('${b.id}', this.value)" class="status-select ${statusClass}">
+          <option value="Payment Verification Pending" ${b.status && b.status.includes("Pending") ? "selected" : ""}>Pending</option>
+          <option value="Confirmed" ${b.status == "Confirmed" ? "selected" : ""}>Confirmed</option>
+          <option value="Completed" ${b.status == "Completed" ? "selected" : ""}>Completed</option>
+          <option value="Cancelled" ${b.status == "Cancelled" ? "selected" : ""}>Cancelled</option>
+        </select>
+      </td>
+      
+      <td>
+        <select class="worker-select" onchange="assignWorker('${b.id}', this.value)">
+          <option value="">-- Assign --</option>
+          <option value="worker1@test.com" ${b.worker == "worker1@test.com" ? "selected" : ""}>Worker 1</option>
+          <option value="worker2@test.com" ${b.worker == "worker2@test.com" ? "selected" : ""}>Worker 2</option>
+        </select>
+      </td>
+    `;
+    tableBody.appendChild(tr);
+  });
+};
+
+const updateStats = (list) => {
+  const total = list.length;
+  const pending = list.filter(b => (b.status || '').toLowerCase().includes('pending')).length;
+  const confirmed = list.filter(b => (b.status || '').toLowerCase().includes('confirmed')).length;
+  const completed = list.filter(b => (b.status || '').toLowerCase().includes('completed')).length;
+
+  document.getElementById('statTotal').innerText = total;
+  document.getElementById('statPending').innerText = pending;
+  document.getElementById('statConfirmed').innerText = confirmed;
+  document.getElementById('statCompleted').innerText = completed;
+};
+
+window.exportCsv = () => {
+  if (!bookingsCache.length) {
+    alert('No data to export');
+    return;
+  }
+
+  const preferredOrder = [
+    'id', 'name', 'phone', 'service', 'date', 'timeSlot', 'amount', 'status',
+    'grocery', 'address', 'latitude', 'longitude', 'worker', 'timestamp'
+  ];
+
+  const allKeys = new Set();
+  bookingsCache.forEach((b) => {
+    Object.keys(b).forEach((k) => allKeys.add(k));
+  });
+
+  const remainingKeys = Array.from(allKeys).filter(k => !preferredOrder.includes(k));
+  const headers = preferredOrder.concat(remainingKeys);
+
+  const csvEscape = (value) => {
+    const str = String(value ?? '');
+    if (/[",\n]/.test(str)) {
+      return '"' + str.replace(/"/g, '""') + '"';
+    }
+    return str;
+  };
+
+  const formatValue = (val) => {
+    if (val && typeof val === 'object') {
+      if (typeof val.seconds === 'number') {
+        return new Date(val.seconds * 1000).toISOString();
+      }
+      return JSON.stringify(val);
+    }
+    return val;
+  };
+
+  const rows = [headers.map(csvEscape).join(',')];
+  bookingsCache.forEach((b) => {
+    const row = headers.map((key) => {
+      const value = key === 'id' ? b.id : formatValue(b[key]);
+      return csvEscape(value ?? '');
+    }).join(',');
+    rows.push(row);
+  });
+
+  const blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `tasknest_bookings_${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 };
 
 // UPDATE STATUS
@@ -281,7 +548,10 @@ window.assignWorker = async (id, val) => {
         alert("Error assigning worker");
     }
 };
+
+document.getElementById('searchInput')?.addEventListener('input', applyFilters);
 </script>
 
+</div>
 </body>
 </html>
